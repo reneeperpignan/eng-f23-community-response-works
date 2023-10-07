@@ -1,4 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import  { useEffect, useState } from 'react';
+import '@radix-ui/themes/styles.css';
+import { Theme } from '@radix-ui/themes';
+import { Card } from '@radix-ui/themes';
+import { Text, Flex } from '@radix-ui/themes';
+import { PushSpinner} from "react-spinners-kit";
+import { Button } from '@radix-ui/themes';
+// import { Dialog, TextField } from '@radix-ui/react-dialog';
+
+import FeedbackDialog from './feedback'; // Adjust the import path as needed
+
+  // import { Dialog, TextField } from '@radix-ui/react-dialog';
+
+  // Import the FeedbackForm component
+
 
 // Example function to show how an API might behave
 async function queryExampleAPI(querystring) {
@@ -35,6 +49,8 @@ function DataDashboard() {
   // Defining a state variable to store the data
   // State variable is initially null, but will update once the API request finishes
   const [dashboardData, setDashboardData] = useState(null);
+  const [isFeedbackDialogOpen, setIsFeedbackDialogOpen] = useState(false);
+
 
   // As if data was loading but will replace this with actual API requests
   useEffect(() => {
@@ -60,17 +76,44 @@ function DataDashboard() {
   }, []); // Make sure to include the dependency array in useEffect, or your app will infinite loop
 
   const dashboard = dashboardData ? dashboardData.map((item, index) => (
-    <li key={index}>
-      <strong>{item.question}:</strong> {item.answer}
-    </li>
-  )) : "Loading..."
+    <div key={index}>
+    <Flex direction="column" gap="3" >
+      <Card variant="surface">
+        <Text as="div" size="2" weight="bold">
+        {item.question}       
+         </Text>
+        <Text as="div" color="gray" size="2">
+        {item.answer}        
+        </Text>
+      </Card>
+    </Flex>
+    </div>
+
+  )) : (
+  <PushSpinner size={40} color="grey" left="50%"
+       /> 
+
+ )
 
   return (
     <div>
-      <h2>Data Dashboard</h2>
-      <ul>
-        {dashboard}
-      </ul>
+      <Theme>
+        {/* Only show the loading spinner when dashboardData is null */}
+        {dashboardData === null ? (
+          <PushSpinner size={40} color="grey" left="50%"
+          /> 
+        ) : (
+          <>
+            <h2>Data Dashboard</h2>
+            <ul>{dashboard}</ul>
+            <div>
+              <Button onClick={() => setIsFeedbackDialogOpen(true)}>Feedback</Button>
+            </div>
+            {/* Render the FeedbackDialog component */}
+            <FeedbackDialog open={isFeedbackDialogOpen} onClose={() => setIsFeedbackDialogOpen(false)} />
+                </>
+        )}
+      </Theme>
     </div>
   );
 }
